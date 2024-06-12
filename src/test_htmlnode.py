@@ -24,5 +24,22 @@ class TestHTMLNode(unittest.TestCase):
             props_to_str_2, node2.props_to_html()
         )
 
+class TestLeafNode(unittest.TestCase):
+    def test_constructor_error(self):
+        with self.assertRaises(ValueError):
+            node = htmlnode.LeafNode("p")
+
+    def test_render(self):
+        node1 = htmlnode.LeafNode("p", "This is a paragraph of text.")
+        node2 = htmlnode.LeafNode("a", "Click me!", {"href": "https://www.google.com"})
+        html_rendered1 = '<p>This is a paragraph of text.</p>'
+        html_rendered2 = '<a href="https://www.google.com">Click me!</a>'
+        self.assertEqual(
+            html_rendered1, node1.to_html()
+        )
+        self.assertEqual(
+            html_rendered2, node2.to_html()
+        )
+
 if __name__ == "__main__":
     unittest.main()
