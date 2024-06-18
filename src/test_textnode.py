@@ -14,6 +14,7 @@ from inline_markdown import (
     split_nodes_delimiter,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
 )
 
 class TestTextNode(unittest.TestCase):
@@ -115,7 +116,6 @@ class TestSplitNodesImage(unittest.TestCase):
         expected_nodes = [node]
 
         result_nodes = split_nodes_image([node])
-
         self.assertEqual(result_nodes, expected_nodes)
 
     def test_split_nodes_image_mixed_types(self):
@@ -180,6 +180,79 @@ class TestSplitNodesLink(unittest.TestCase):
             self.assertEqual(result_node.text, expected_node.text)
             self.assertEqual(result_node.text_type, expected_node.text_type)
             self.assertEqual(result_node.url, expected_node.url)
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_plain_text(self):
+        text = "This is plain text."
+        expected_nodes = [TextNode("This is plain text.", text_type_text)]
+        result_nodes = text_to_textnodes(text)
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_bold_text(self):
+        text = "This is **bold** text."
+        expected_nodes = [
+            TextNode("This is ", text_type_text),
+            TextNode("bold", text_type_bold),
+            TextNode(" text.", text_type_text),
+        ]
+        result_nodes = text_to_textnodes(text)
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_italic_text(self):
+        text = "This is *italic* text."
+        expected_nodes = [
+            TextNode("This is ", text_type_text),
+            TextNode("italic", text_type_italic),
+            TextNode(" text.", text_type_text),
+        ]
+        result_nodes = text_to_textnodes(text)
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_code_text(self):
+        text = "This is `code` text."
+        expected_nodes = [
+            TextNode("This is ", text_type_text),
+            TextNode("code", text_type_code),
+            TextNode(" text.", text_type_text),
+        ]
+        result_nodes = text_to_textnodes(text)
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_image(self):
+        text = "This is text with an ![image](https://example.com/image.png)."
+        expected_nodes = [
+            TextNode("This is text with an ", text_type_text),
+            TextNode("image", text_type_image, "https://example.com/image.png"),
+            TextNode(".", text_type_text),
+        ]
+        result_nodes = text_to_textnodes(text)
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_link(self):
+        text = "This is text with a [link](https://example.com)."
+        expected_nodes = [
+            TextNode("This is text with a ", text_type_text),
+            TextNode("link", text_type_link, "https://example.com"),
+            TextNode(".", text_type_text),
+        ]
+        result_nodes = text_to_textnodes(text)
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_mixed_formatting(self):
+        text = "This is *italic* and **bold** text with `code` and ![image](https://example.com/image.png)."
+        expected_nodes = [
+            TextNode("This is ", text_type_text),
+            TextNode("italic", text_type_italic),
+            TextNode(" and ", text_type_text),
+            TextNode("bold", text_type_bold),
+            TextNode(" text with ", text_type_text),
+            TextNode("code", text_type_code),
+            TextNode(" and ", text_type_text),
+            TextNode("image", text_type_image, "https://example.com/image.png"),
+            TextNode(".", text_type_text),
+        ]
+        result_nodes = text_to_textnodes(text)
+        self.assertEqual(result_nodes, expected_nodes)
 
 
 if __name__ == "__main__":

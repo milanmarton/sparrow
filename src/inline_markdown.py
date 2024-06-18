@@ -2,11 +2,11 @@ import re
 from textnode import (
     TextNode,
     text_type_text,
-    # text_type_bold,
-    # text_type_italic,
-    # text_type_code,
-     text_type_image,
-     text_type_link,
+    text_type_bold,
+    text_type_italic,
+    text_type_code,
+    text_type_image,
+    text_type_link,
 )
 # doesnt work with mixed italic and bold types in the same text
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: str) -> list[TextNode]:
@@ -61,10 +61,12 @@ def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
             continue
 
         temp_text = old_node.text[:]
-        for image in images:
+        for i, image in enumerate(images):
             new_text = temp_text.split(f'![{image[0]}]({image[1]})', 1)
             new_nodes.append(TextNode(new_text[0], text_type_text))
             new_nodes.append(TextNode(image[0], text_type_image, image[1]))
+            if i == len(images) - 1 and new_text[1]:
+                new_nodes.append(TextNode(new_text[1], text_type_text))
             temp_text = new_text[1]
 
     return new_nodes
@@ -82,10 +84,24 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
             continue
 
         temp_text = old_node.text[:]
-        for link in links:
+        for i, link in enumerate(links):
             new_text = temp_text.split(f'[{link[0]}]({link[1]})', 1)
             new_nodes.append(TextNode(new_text[0], text_type_text))
             new_nodes.append(TextNode(link[0], text_type_link, link[1]))
+            if i == len(links) - 1 and new_text[1]:
+                new_nodes.append(TextNode(new_text[1], text_type_text))
             temp_text = new_text[1]
 
     return new_nodes
+
+def text_to_textnodes(text: str) -> list[TextNode]:
+    first_node = TextNode(text, text_type_text)
+    nodes = [first_node]
+
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    nodes = split_nodes_delimiter(nodes, '**', text_type_bold)
+    nodes = split_nodes_delimiter(nodes, '*', text_type_italic)
+    nodes = split_nodes_delimiter(nodes, '`', text_type_code)
+
+    return nodes
