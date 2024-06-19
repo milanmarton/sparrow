@@ -41,6 +41,12 @@ class LeafNode(HTMLNode):
             raise ValueError
         if self.tag is None:
             return self.value
+
+        # somehow the boot.dev website doesnt bring attention to the problem that img tags work in a different way
+        # well later I've found out, that only HTML5 doesn't require the closing tag, XHTML requires it
+        if self.tag == 'img':
+            return f'<{self.tag}{self.props_to_html()} {self.value}/>'
+            
         return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
 
 class ParentNode(HTMLNode):
