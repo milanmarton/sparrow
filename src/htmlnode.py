@@ -60,22 +60,6 @@ class ParentNode(HTMLNode):
         return f'<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>'
 
 def text_node_to_html_node(text_node: TextNode) -> LeafNode:
-    # match text_node.text_type:
-    #     case text_type_text:
-    #         return LeafNode(None, text_node.text)
-    #     case text_type_bold:
-    #         return LeafNode('b', text_node.text)
-    #     case text_type_italic:
-    #         return LeafNode('i', text_node.text)
-    #     case text_type_code:
-    #         return LeafNode('code', text_node.text)
-    #     case text_type_link:
-    #         return LeafNode('a', text_node.text, {'href': text_node.url})
-    #     case text_type_image:
-    #         return LeafNode('img', '', {'src': text_node.url, 'alt': text_node.text})
-    #     case _:
-    #         raise NotImplementedError
-
     # for some reason the switch case doesn't work with the imported text_types
             
     if text_node.text_type == text_type_text:
