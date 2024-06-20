@@ -1,4 +1,5 @@
 from os import (
+    makedirs,
     path,
     listdir,
     mkdir,
@@ -7,6 +8,7 @@ import shutil
 from block_markdown import (
     markdown_to_htmlnode,
 )
+import pathlib
 
 def copy_fulldir(src: str, dst: str) -> None:
     if not path.exists(src):
@@ -50,14 +52,33 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
     title = extract_title(md_contents)
 
     html_file = tp_contents.replace('{{ Title }}', title).replace('{{ Content }}', html)
-    if not path.exists(dest_path):
-        mkdir(dest_path)
+    # if not path.exists(dest_path):
+        # mkdir(dest_path)
     with open(dest_path, 'w') as dst:
         dst.write(html_file)
 
-    shutil.copy2('./index.css', './public/index.css')
-    copy_fulldir('./images', './public/images')
+    # shutil.copy2('./index.css', './public/index.css')
+    # copy_fulldir('./images', './public/images')
+
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str) -> None:
+    if not path.exists(dir_path_content):
+        raise OSError('Content directory not found')
+    if not path.exists(dest_dir_path):
+        makedirs(dest_dir_path)
+
+    concrete_template_path = pathlib.Path(template_path)
+
+    for item in listdir(dir_path_content):
+        src_item = path.join(dir_path_content, item)
+        dst_item = path.join(dest_dir_path, item)
+
+        if path.isdir(src_item):
+            generate_pages_recursive(src_item, str(concrete_template_path), dst_item)
+        elif src_item.endswith('.md'):
+            dst_item = dst_item.replace('.md', ".html")
+            generate_page(src_item, str(concrete_template_path), dst_item)
+        else:
+            shutil.copy2(src_item, dst_item)
 
 if __name__ == '__main__':
-    # copy_fulldir('./static', './public')
-    generate_page('./content/index.md', './template.html', './public/index.html')
+    generate_pages_recursive('./content', './template.html', './public')
