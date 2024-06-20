@@ -1,10 +1,12 @@
 # sparrow
 A static site generator (project from boot.dev)
 
-just adding some extra stuff here
+Currently doesn't support nested delimiters, but I will implement it in the future.
 
-adding even more stuff
-
-hopefully the last commit like this to make this work
-
-another try???
+## Usage
+- Have Python 13.2+ installed
+- Use the example template.html or modify it for your personal needs (only the {{ Title }} and {{ Content }} will be changed)
+- Use the example index.css or modify it for your personal needs
+- Write your Markdown inside the 'content' folder
+- Run ```./main.sh``` in your terminal
+- If you don't have permission to run it, then run ```chmod +x main.sh```
